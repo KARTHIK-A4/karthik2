@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title> virtual pet</title>
+    <style>
+        body {
+            font-family: 'Comic Sans Ms',cursive,sans-serif;
+            background: linear-gradient(to bottom,#b2e897,#b24669);
+            text-align: center;
+            padding: 20px;
+            transition: background 1s;
+        }
+        h1 {
+            font-size: 36px;
+            color: #444;
+            margin-bottom: 10px;    
+        }
+        .pet {
+            width: 200px;
+            height: 200px;
+            margin: 10px auto;
+            background: url('https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXJ5eG5reW0yNmNvbmFzZDc4bjF3ZmxqcWMzenpramZmYmN5N3VoaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/GRk3GLfzduq1NtfGt5/giphy.gif') center center / contain no-repeat;
+        }
+        .stats {
+            margin: 20px 0;
+        }
+        .bar-container {
+            background: #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 20px;
+            margin: 10px auto;
+            width: 80%;
+        }
+        .bar {
+            height: 100%;
+            transition: width 0.5s;
+        }
+        .bar.hunger { background: #d30b0b;}
+        .bar.happiness { background: #0ea2e7;}
+        .bar.energy { background: #08ef10;}
+
+        .message {
+            font-size: 20px;
+            color: #333;
+            margin: 15px 0;
+        }
+
+        button {
+            font-size: 18px;
+            padding: 12 px 15px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #ff7e5f;
+            color: white;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s,transform 0.2s;
+        }
+        button:hover {
+            background: #feb47b;
+            transform: translateY(-2px);
+        }
+    </style>
+</head> 
+<body>
+
+    <h1> my virtual pet </h1>
+    <div class="pet" id="petImage"></div>
+
+    <div class="stats">
+        <div>Hunger:</div>
+        <div class="bar-container">
+            <div class="bar hunger" id="hungerBar"></div>
+        </div>
+        
+        <div> Happiness:</div>
+        <div class="bar-container">
+            <div class="bar happiness" id="happiness"></div>
+        </div>
+
+        </div>Energy:</div>
+        <div class="bar-container">
+            <div class="bar energy" id="energyBar"></div>
+        </div>
+    </div>
+
+    <div class="message" id="message">I am happy!</div>
+
+    <button onclick="feedPet()">feed</button>
+    <button onclick="playPet()">play</button>
+    <button onclick="sleepPet()">sleep</button>
+    
+    <script>
+        // Load or set defaults
+        let hunger = parseFloat(localStorage.getItem('pet_hunger')) || 5;
+        let happiness = parseFloat(localStorage.getItem('pet_happiness')) || 5;
+        let energy = parseFloat(localStorage.getItem('pet_energy')) || 5;
+         
+        const hungerBar = document.getElementById('hungerBar');
+        const happinessBar = document.getElementById('happinessBar');
+        const energyBar = document.getElementById('energyBar');
+        const messageEl = document.getElementById('message');
+        const petImageEl = document.getElementById('petImage');
+
+        function updateBars() {
+            hungerBar.style.width = (hunger * 10) + '%';
+            happinessBar.style.width = (happiness * 10) + '%';
+            energyBar.style.width = (energy * 10) + '%';
+             
+            //Save state
+            localStorage.setItem('pet_hunger',hunger);
+            localStorage.setItem('pet_happiness',happiness);
+            localStorage.setItem('pet_energy',energy);
+
+            // change background color mood
+            if (happiness >=8) {
+                document.body.style.background = 'linear-gradient(to bottom, #a8edea, #a1ffce)';
+                messageEl.innerText ="i'm super happy!";
+            }else if (hunger >=8) {
+                document.body.style.background = 'linear-gradient(to bottom, #fff6b7, #f6416c)';
+                messageEl.innerText ="i'm starving!";
+            }else if (energy <=2) {
+                document.body.style.background = 'linear-gradient(to bottom, #d7d2cc, #304352)';
+                messageEl.innerText ="i'm exhausted...";
+            }else {
+                document.body.style.background = 'linear-gradient(to bottom, #a8edea, #fed6e3)';
+                messageEl.innerText ="i'm happy!"; 
+            }
+        }
+
+        function feedPet(){
+            hunger = Math.max(0, hunger -3);
+            happiness = Math.min(10, happiness +1);
+            updateBars();
+        }
+
+        function playPet() {
+            if(energy >=2){
+                happiness = Math.min(10, happiness +2);
+                hunger = Math.min(10, hunger +1);
+                energy = Math.max(0, energy -2);
+                updateBars();
+            }else {
+                messageEl.innerText="i'm too tired to play!";
+            }
+        }
+
+        function sleepPet() {
+            energy = Math.min(10, energy +4);
+            hunger = Math.min(10, hunger +1);
+            updateBars();
+        }
+         
+        function autoDecay(){
+            hunger = Math.min(10, hunger + 0.2);
+            happiness = Math.max(0, happiness -0.15);
+            energy = Math.max(0, energy -0.1);
+            updateBars();
+        }
+        
+        // Game loop
+        setInterval(autoDecay, 3000);
+
+        // Init
+        updateBars();
+    </script>
+
+</body>
+</html>   
